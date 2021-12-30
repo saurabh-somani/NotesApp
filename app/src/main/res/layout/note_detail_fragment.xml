@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools">
+
+    <data>
+
+        <variable
+            name="viewModel"
+            type="com.example.notesapp.viewmodels.NoteDetailViewModel" />
+    </data>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:orientation="vertical"
+        tools:context=".ui.NoteDetailFragment">
+
+        <EditText
+            android:id="@+id/noteTitle"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:autofillHints="Title"
+            android:hint="@string/enter_title"
+            android:inputType="text"
+            android:textSize="24sp"
+            tools:ignore="LabelFor"
+            tools:text="Sample title" />
+
+        <EditText
+            android:id="@+id/noteDescription"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_marginTop="16dp"
+            android:autofillHints="Description"
+            android:gravity="top|start"
+            android:hint="@string/enter_description"
+            android:inputType="textMultiLine"
+            tools:ignore="LabelFor"
+            tools:text="This is a sample description." />
+
+    </LinearLayout>
+</layout>
