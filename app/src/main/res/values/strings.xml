@@ -4,4 +4,5 @@
     <string name="enter_description">Enter description&#8230;</string>
     <string name="snackbar_on_item_delete_text">Note deleted</string>
     <string name="snackbar_on_item_delete_action_text">Undo</string>
+    <string name="note_detail_timestamp_text">Created: %1$s</string>
 </resources>

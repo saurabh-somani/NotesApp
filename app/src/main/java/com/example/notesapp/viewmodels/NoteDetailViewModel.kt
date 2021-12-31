@@ -4,6 +4,7 @@ import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.notesapp.repository.NotesRepo
+import com.example.notesapp.util.formatNoteDate
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
@@ -32,7 +33,8 @@ class NoteDetailViewModel @Inject constructor(
                     noteDetailUiState.copy(
                         isLoading = false,
                         title = it.title,
-                        description = it.description
+                        description = it.description,
+                        timestamp = formatNoteDate(it.timestamp)
                     )
                 }
             }
@@ -55,5 +57,6 @@ class NoteDetailViewModel @Inject constructor(
 data class NoteDetailUiState(
     val isLoading: Boolean = false,
     val title: String = "",
-    val description: String = ""
+    val description: String = "",
+    val timestamp: String = ""
 )

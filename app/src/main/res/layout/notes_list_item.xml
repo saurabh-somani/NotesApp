@@ -28,7 +28,8 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:text="@{noteItemUiState.title}"
-                android:textSize="24sp"
+                android:textSize="20sp"
+                android:textStyle="bold"
                 tools:text="Title" />
 
             <TextView
@@ -42,6 +43,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:text="@{noteItemUiState.timestamp}"
+                android:visibility="gone"
                 tools:text="27/12/2021 00:48:13" />
         </LinearLayout>
     </androidx.cardview.widget.CardView>

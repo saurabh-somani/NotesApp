@@ -13,6 +13,7 @@ import androidx.fragment.app.viewModels
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
+import com.example.notesapp.R
 import com.example.notesapp.databinding.NoteDetailFragmentBinding
 import com.example.notesapp.viewmodels.NoteDetailViewModel
 import dagger.hilt.android.AndroidEntryPoint
@@ -54,6 +55,8 @@ class NoteDetailFragment : Fragment() {
                     binding.root.isVisible = !noteDetailUiState.isLoading
                     binding.noteTitle.setText(noteDetailUiState.title)
                     binding.noteDescription.setText(noteDetailUiState.description)
+                    binding.noteTimestamp.text = getString(R.string.note_detail_timestamp_text,
+                        noteDetailUiState.timestamp)
                 }
             }
         }
