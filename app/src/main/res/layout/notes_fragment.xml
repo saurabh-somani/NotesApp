@@ -7,11 +7,11 @@
 
         <variable
             name="viewModel"
-            type="com.example.notesapp.viewmodels.NotesViewModel" />
+            type="com.saurabhsomani.notesapp.viewmodels.NotesViewModel" />
 
         <variable
             name="notesAdapter"
-            type="com.example.notesapp.adapter.NotesAdapter" />
+            type="com.saurabhsomani.notesapp.adapter.NotesAdapter" />
     </data>
 
     <androidx.constraintlayout.widget.ConstraintLayout
@@ -19,7 +19,7 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:background="@color/yellow_primary_light"
-        tools:context=".ui.NotesFragment">
+        tools:context="com.saurabhsomani.notesapp.ui.NotesFragment">
 
         <androidx.recyclerview.widget.RecyclerView
             android:id="@+id/notesRecyclerView"

@@ -7,7 +7,7 @@
 
         <variable
             name="noteItemUiState"
-            type="com.example.notesapp.viewmodels.NoteItemUiState" />
+            type="com.saurabhsomani.notesapp.viewmodels.NoteItemUiState" />
     </data>
 
     <androidx.cardview.widget.CardView

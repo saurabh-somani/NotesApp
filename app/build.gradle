@@ -10,7 +10,7 @@ android {
     compileSdk 31
 
     defaultConfig {
-        applicationId "com.example.notesapp"
+        applicationId "com.saurabhsomani.notesapp"
         minSdk 26
         targetSdk 31
         versionCode 1
