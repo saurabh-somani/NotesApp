@@ -2,4 +2,6 @@
     <string name="app_name">NotesApp</string>
     <string name="enter_title">Enter title&#8230;</string>
     <string name="enter_description">Enter description&#8230;</string>
+    <string name="snackbar_on_item_delete_text">Note deleted</string>
+    <string name="snackbar_on_item_delete_action_text">Undo</string>
 </resources>

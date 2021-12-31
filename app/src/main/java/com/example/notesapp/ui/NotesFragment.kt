@@ -13,7 +13,10 @@ import androidx.lifecycle.repeatOnLifecycle
 import androidx.navigation.findNavController
 import com.example.notesapp.adapter.NotesAdapter
 import com.example.notesapp.databinding.NotesFragmentBinding
+import com.example.notesapp.util.getResStrByName
+import com.example.notesapp.viewmodels.NotesEvent
 import com.example.notesapp.viewmodels.NotesViewModel
+import com.google.android.material.snackbar.Snackbar
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.launch
@@ -49,8 +52,32 @@ class NotesFragment : Fragment() {
                 launch {
                     onNavEventUpdates()
                 }
+                launch {
+                    onSnackBarEventUpdates()
+                }
             }
         }
+    }
+
+    private suspend fun onSnackBarEventUpdates() {
+        viewModel.uiState.collect { notesUiState ->
+            Log.d(TAG, "onSnackBarEventUpdates: $notesUiState")
+            notesUiState.snackBarEvents.firstOrNull()?.let {
+                showSnackBar(it)
+                viewModel.onSnackBarShown(it.id)
+            }
+        }
+    }
+
+    private fun showSnackBar(snackBarEvent: NotesEvent.SnackBarEvent) {
+        Log.d(TAG, "showSnackBar: ")
+        Snackbar.make(
+            binding.root,
+            context.getResStrByName(snackBarEvent.messageResStr),
+            Snackbar.LENGTH_LONG
+        ).setAction(context.getResStrByName(snackBarEvent.actionTextResStr)) {
+            snackBarEvent.onActionClick.invoke()
+        }.show()
     }
 
     private suspend fun onNotesAdapterUpdates() {

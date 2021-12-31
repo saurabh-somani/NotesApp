@@ -18,20 +18,22 @@
         android:id="@+id/main"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:background="@color/yellow_primary"
+        android:background="@color/yellow_primary_light"
         tools:context=".ui.NotesFragment">
 
         <androidx.recyclerview.widget.RecyclerView
             android:id="@+id/notesRecyclerView"
+            onSwiped="@{notesAdapter}"
             android:layout_width="0dp"
             android:layout_height="0dp"
             android:adapter="@{notesAdapter}"
-            onSwiped="@{notesAdapter}"
-            app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
+            android:orientation="vertical"
+            app:layoutManager="androidx.recyclerview.widget.StaggeredGridLayoutManager"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent"
+            app:spanCount="2"
             tools:listitem="@layout/notes_list_item" />
 
         <com.google.android.material.floatingactionbutton.FloatingActionButton
