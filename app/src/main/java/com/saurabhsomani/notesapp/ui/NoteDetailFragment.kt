@@ -3,6 +3,7 @@ package com.saurabhsomani.notesapp.ui
 import android.os.Bundle
 import android.util.Log
 import android.view.LayoutInflater
+import android.view.Menu
 import android.view.View
 import android.view.ViewGroup
 import androidx.core.view.isVisible
@@ -25,6 +26,11 @@ class NoteDetailFragment : Fragment() {
 
     private lateinit var binding: NoteDetailFragmentBinding
     private val viewModel by viewModels<NoteDetailViewModel>()
+
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        setHasOptionsMenu(true)
+    }
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -60,6 +66,12 @@ class NoteDetailFragment : Fragment() {
                 }
             }
         }
+    }
+
+    override fun onPrepareOptionsMenu(menu: Menu) {
+        super.onPrepareOptionsMenu(menu)
+        val item = menu.findItem(R.id.action_sign_out)
+        item.isVisible = false
     }
 
     companion object {

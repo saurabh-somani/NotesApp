@@ -3,11 +3,14 @@
   <component name="DesignSurface">
     <option name="filePathToZoomLevelMap">
       <map>
+        <entry key="app/src/main/res/layout/activity_firebase_sign_in.xml" value="0.35208333333333336" />
+        <entry key="app/src/main/res/layout/activity_sign_in.xml" value="0.1" />
         <entry key="app/src/main/res/layout/main_activity.xml" value="0.35260416666666666" />
         <entry key="app/src/main/res/layout/main_fragment.xml" value="0.35260416666666666" />
         <entry key="app/src/main/res/layout/note_detail_fragment.xml" value="0.35260416666666666" />
         <entry key="app/src/main/res/layout/notes_fragment.xml" value="0.24074074074074073" />
         <entry key="app/src/main/res/layout/notes_list_item.xml" value="0.35260416666666666" />
+        <entry key="app/src/main/res/menu/overflow_menu.xml" value="0.35208333333333336" />
       </map>
     </option>
   </component>

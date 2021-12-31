@@ -5,4 +5,11 @@
     <string name="snackbar_on_item_delete_text">Note deleted</string>
     <string name="snackbar_on_item_delete_action_text">Undo</string>
     <string name="note_detail_timestamp_text">Created: %1$s</string>
+    <string name="login_button_text">Login</string>
+    <string name="login_screen_text">Welcome to Notes App!</string>
+    <string name="sign_in_cancelled">Sign in cancelled</string>
+    <string name="no_internet_connection">Internet connection not available</string>
+    <string name="unknown_error">Unknown error</string>
+    <string name="overflow_menu_sign_out">Sign out</string>
+    <string name="overflow_menu_test_crash">Test crash</string>
 </resources>
