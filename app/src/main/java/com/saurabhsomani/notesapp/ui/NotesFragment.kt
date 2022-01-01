@@ -15,10 +15,12 @@ import com.google.android.material.snackbar.Snackbar
 import com.saurabhsomani.notesapp.adapter.NotesAdapter
 import com.saurabhsomani.notesapp.databinding.NotesFragmentBinding
 import com.saurabhsomani.notesapp.util.getResStrByName
-import com.saurabhsomani.notesapp.viewmodels.NotesEvent
 import com.saurabhsomani.notesapp.viewmodels.NotesViewModel
+import com.saurabhsomani.notesapp.viewmodels.NotesViewModel.NotesEvent
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.flow.collect
+import kotlinx.coroutines.flow.distinctUntilChanged
+import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
 
 @AndroidEntryPoint
@@ -44,8 +46,15 @@ class NotesFragment : Fragment() {
         super.onViewCreated(view, savedInstanceState)
 
         Log.d(TAG, "onViewCreated: ")
+        receiveUiStateUpdates()
+    }
+
+    private fun receiveUiStateUpdates() {
         viewLifecycleOwner.lifecycleScope.launch {
             repeatOnLifecycle(Lifecycle.State.STARTED) {
+                launch {
+                    setUsername()
+                }
                 launch {
                     onNotesAdapterUpdates()
                 }
@@ -59,18 +68,29 @@ class NotesFragment : Fragment() {
         }
     }
 
-    private suspend fun onSnackBarEventUpdates() {
-        viewModel.uiState.collect { notesUiState ->
-            Log.d(TAG, "onSnackBarEventUpdates: $notesUiState")
-            notesUiState.snackBarEvents.firstOrNull()?.let {
-                showSnackBar(it)
-                viewModel.onSnackBarShown(it.id)
+    private suspend fun setUsername() {
+        viewModel.uiState
+            .map { it.username }
+            .collect {
+                binding.notesUsername.text = it
             }
-        }
+    }
+
+    private suspend fun onSnackBarEventUpdates() {
+        viewModel.uiState
+            .map { it.snackBarEvents }
+            .distinctUntilChanged()
+            .collect { snackbarEvents ->
+                Log.d(TAG, "onSnackBarEventUpdates: $snackbarEvents")
+                snackbarEvents.firstOrNull()?.let {
+                    showSnackBar(it)
+                    viewModel.onSnackBarShown(it.id)
+                }
+            }
     }
 
     private fun showSnackBar(snackBarEvent: NotesEvent.SnackBarEvent) {
-        Log.d(TAG, "showSnackBar: ")
+        Log.d(TAG, "showSnackBar: $snackBarEvent")
         Snackbar.make(
             binding.root,
             context.getResStrByName(snackBarEvent.messageResStr),
@@ -81,19 +101,26 @@ class NotesFragment : Fragment() {
     }
 
     private suspend fun onNotesAdapterUpdates() {
-        viewModel.notesUiItems.collect {
-            binding.notesAdapter?.submitList(it)
-        }
+        viewModel.uiState
+            .map { it.notesUiItems }
+            .distinctUntilChanged()
+            .collect { noteItemUiStateList ->
+                Log.d(TAG, "onNotesAdapterUpdates: $noteItemUiStateList")
+                binding.notesAdapter?.submitList(noteItemUiStateList)
+            }
     }
 
     private suspend fun onNavEventUpdates() {
-        viewModel.uiState.collect { notesUiState ->
-            Log.d(TAG, "onNavEventUpdates: $notesUiState")
-            notesUiState.navEvents.firstOrNull()?.let {
-                navigateToDetailFragment(it.noteId)
-                viewModel.onNavComplete()
+        viewModel.uiState
+            .map { it.navEvents }
+            .distinctUntilChanged()
+            .collect { navEvents ->
+                Log.d(TAG, "onNavEventUpdates: $navEvents")
+                navEvents.firstOrNull()?.let {
+                    navigateToDetailFragment(it.noteId)
+                    viewModel.onNavComplete()
+                }
             }
-        }
     }
 
     private fun navigateToDetailFragment(noteId: Long) {

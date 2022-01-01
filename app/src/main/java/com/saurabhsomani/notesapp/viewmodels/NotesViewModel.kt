@@ -5,7 +5,10 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.saurabhsomani.notesapp.util.formatNoteDate
 import com.saurabhsomani.notesapp.database.entities.Note
-import com.saurabhsomani.notesapp.repository.NotesRepo
+import com.saurabhsomani.notesapp.usecases.DeleteNoteUseCase
+import com.saurabhsomani.notesapp.usecases.FetchNotesUseCase
+import com.saurabhsomani.notesapp.usecases.InsertNoteUseCase
+import com.saurabhsomani.notesapp.usecases.GetUsernameUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
@@ -13,30 +16,47 @@ import javax.inject.Inject
 
 @HiltViewModel
 class NotesViewModel @Inject constructor(
-    private val notesRepo: NotesRepo
+    private val fetchNotesUseCase: FetchNotesUseCase,
+    private val deleteNoteUseCase: DeleteNoteUseCase,
+    private val insertNoteUseCase: InsertNoteUseCase,
+    getUsernameUseCase: GetUsernameUseCase
 ) : ViewModel() {
 
-    val notesUiItems = notesRepo.getAllNotes().map { notes ->
-        notes.map { note ->
-            NoteItemUiState(
-                id = note.id,
-                title = note.title,
-                description = note.description,
-                timestamp = formatNoteDate(note.timestamp),
-                onClick = {
-                    navigateToDetailScreen(note.id)
-                },
-                onSwipe = {
-                    deleteItem(note.id)
-                    showSnackBar(note)
+    private val _uiState = MutableStateFlow(NotesUiState(getUsernameUseCase()))
+    val uiState = _uiState.asStateFlow()
+
+    init {
+        collectNotesUiItems()
+    }
+
+    private fun collectNotesUiItems() {
+        viewModelScope.launch {
+            fetchNotesUseCase.getAllNotes()
+                .map { it.getNoteItems() }
+                .collect { noteItems ->
+                    _uiState.update { notesUiState ->
+                        Log.d(TAG, "collectNotesUiItems: ")
+                        notesUiState.copy(notesUiItems = noteItems)
+                    }
                 }
-            )
         }
-    }.stateIn(
-        scope = viewModelScope,
-        started = SharingStarted.WhileSubscribed(5000L),
-        initialValue = emptyList()
-    )
+    }
+
+    private fun List<Note>.getNoteItems() = map { note ->
+        NoteItemUiState(
+            id = note.id,
+            title = note.title,
+            description = note.description,
+            timestamp = formatNoteDate(note.timestamp),
+            onClick = {
+                navigateToDetailScreen(note.id)
+            },
+            onSwipe = {
+                deleteItem(note.id)
+                showSnackBar(note)
+            }
+        )
+    }
 
     private fun showSnackBar(note: Note) {
         Log.d(TAG, "showSnackBar: $note")
@@ -57,12 +77,9 @@ class NotesViewModel @Inject constructor(
 
     private fun deleteItem(noteId: Long) {
         viewModelScope.launch {
-            notesRepo.deleteNote(noteId)
+            deleteNoteUseCase(noteId)
         }
     }
-
-    private val _uiState = MutableStateFlow(NotesUiState())
-    val uiState = _uiState.asStateFlow()
 
     fun onFabClicked() {
         Log.d(TAG, "onFabClicked: ")
@@ -74,7 +91,7 @@ class NotesViewModel @Inject constructor(
 
     private suspend fun insertNote(note: Note = Note()): Long {
         Log.d(TAG, "insertNote: ")
-        return notesRepo.insertNote(note)
+        return insertNoteUseCase(note)
     }
 
     private fun navigateToDetailScreen(noteId: Long) {
@@ -104,28 +121,32 @@ class NotesViewModel @Inject constructor(
     companion object {
         private const val TAG = "NotesViewModel"
     }
-}
 
-data class NotesUiState(
-    val navEvents: List<NotesEvent.NavEvent> = emptyList(),
-    val snackBarEvents: List<NotesEvent.SnackBarEvent> = emptyList()
-)
+    // UiState data classes
 
-sealed class NotesEvent {
-    data class NavEvent(val noteId: Long): NotesEvent()
-    data class SnackBarEvent(
+    data class NotesUiState(
+        val username: String,
+        val notesUiItems: List<NoteItemUiState> = emptyList(),
+        val navEvents: List<NotesEvent.NavEvent> = emptyList(),
+        val snackBarEvents: List<NotesEvent.SnackBarEvent> = emptyList()
+    )
+
+    sealed class NotesEvent {
+        data class NavEvent(val noteId: Long): NotesEvent()
+        data class SnackBarEvent(
+            val id: Long,
+            val messageResStr: String,
+            val actionTextResStr: String,
+            val onActionClick: () -> Unit
+        ): NotesEvent()
+    }
+
+    data class NoteItemUiState(
         val id: Long,
-        val messageResStr: String,
-        val actionTextResStr: String,
-        val onActionClick: () -> Unit
-    ): NotesEvent()
+        val title: String,
+        val description: String,
+        val timestamp: String,
+        val onClick: () -> Unit,
+        val onSwipe: () -> Unit
+    )
 }
-
-data class NoteItemUiState(
-    val id: Long,
-    val title: String,
-    val description: String,
-    val timestamp: String,
-    val onClick: () -> Unit,
-    val onSwipe: () -> Unit
-)

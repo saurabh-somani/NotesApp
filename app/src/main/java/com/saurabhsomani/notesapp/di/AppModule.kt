@@ -2,6 +2,8 @@ package com.saurabhsomani.notesapp.di
 
 import android.content.Context
 import androidx.room.Room
+import com.google.firebase.auth.ktx.auth
+import com.google.firebase.ktx.Firebase
 import com.saurabhsomani.notesapp.database.NotesDao
 import com.saurabhsomani.notesapp.database.NotesDatabase
 import com.saurabhsomani.notesapp.repository.NotesRepo
@@ -32,4 +34,7 @@ object AppModule {
 
     @Provides
     fun provideNotesRepo(notesRepoImpl: NotesRepoImpl): NotesRepo = notesRepoImpl
+
+    @Provides
+    fun provideFirebaseUser() = Firebase.auth.currentUser
 }

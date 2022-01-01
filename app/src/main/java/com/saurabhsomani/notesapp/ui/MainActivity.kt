@@ -15,7 +15,6 @@ import com.saurabhsomani.notesapp.R
 import dagger.hilt.android.AndroidEntryPoint
 import java.lang.RuntimeException
 
-
 @AndroidEntryPoint
 class MainActivity : AppCompatActivity() {
 

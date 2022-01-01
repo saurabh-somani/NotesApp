@@ -12,4 +12,7 @@
     <string name="unknown_error">Unknown error</string>
     <string name="overflow_menu_sign_out">Sign out</string>
     <string name="overflow_menu_test_crash">Test crash</string>
+    <string name="notes_screen_username_text">Hello %1$s</string>
+    <string name="username_guest">guest user</string>
+    <string name="notes_screen_title">Notes</string>
 </resources>

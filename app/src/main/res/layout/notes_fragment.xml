@@ -21,18 +21,31 @@
         android:background="@color/yellow_primary_light"
         tools:context="com.saurabhsomani.notesapp.ui.NotesFragment">
 
+        <TextView
+            android:id="@+id/notesUsername"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="8dp"
+            android:textSize="16sp"
+            android:textStyle="bold"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            tools:text="Hello Saurabh" />
+
         <androidx.recyclerview.widget.RecyclerView
             android:id="@+id/notesRecyclerView"
             onSwiped="@{notesAdapter}"
             android:layout_width="0dp"
             android:layout_height="0dp"
+            android:layout_marginTop="16dp"
             android:adapter="@{notesAdapter}"
             android:orientation="vertical"
             app:layoutManager="androidx.recyclerview.widget.StaggeredGridLayoutManager"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/notesUsername"
             app:spanCount="2"
             tools:listitem="@layout/notes_list_item" />
 

@@ -4,6 +4,8 @@ import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.saurabhsomani.notesapp.repository.NotesRepo
+import com.saurabhsomani.notesapp.usecases.FetchNotesUseCase
+import com.saurabhsomani.notesapp.usecases.UpdateNoteUseCase
 import com.saurabhsomani.notesapp.util.formatNoteDate
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.*
@@ -12,7 +14,8 @@ import javax.inject.Inject
 
 @HiltViewModel
 class NoteDetailViewModel @Inject constructor(
-    private val notesRepo: NotesRepo,
+    private val fetchNotesUseCase: FetchNotesUseCase,
+    private val updateNoteUseCase: UpdateNoteUseCase,
     savedStateHandle: SavedStateHandle
 ) : ViewModel() {
 
@@ -27,7 +30,7 @@ class NoteDetailViewModel @Inject constructor(
 
     private fun loadNote() {
         viewModelScope.launch {
-            val note = notesRepo.getNoteById(noteId)
+            val note = fetchNotesUseCase.getNoteById(noteId)
             note?.let {
                 _uiState.update { noteDetailUiState ->
                     noteDetailUiState.copy(
@@ -43,20 +46,20 @@ class NoteDetailViewModel @Inject constructor(
 
     fun saveNoteTitle(text: String) {
         viewModelScope.launch {
-            notesRepo.updateNoteTitle(noteId, text)
+            updateNoteUseCase.updateNoteTitle(noteId, text)
         }
     }
 
     fun saveNoteDescription(text: String) {
         viewModelScope.launch {
-            notesRepo.updateNoteDescription(noteId, text)
+            updateNoteUseCase.updateNoteDescription(noteId, text)
         }
     }
-}
 
-data class NoteDetailUiState(
-    val isLoading: Boolean = false,
-    val title: String = "",
-    val description: String = "",
-    val timestamp: String = ""
-)
+    data class NoteDetailUiState(
+        val isLoading: Boolean = false,
+        val title: String = "",
+        val description: String = "",
+        val timestamp: String = ""
+    )
+}
