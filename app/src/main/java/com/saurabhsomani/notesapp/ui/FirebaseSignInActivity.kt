@@ -43,6 +43,7 @@ class FirebaseSignInActivity : AppCompatActivity() {
         val providers = listOf(
             AuthUI.IdpConfig.GoogleBuilder().build(),
             AuthUI.IdpConfig.EmailBuilder().build(),
+            AuthUI.IdpConfig.PhoneBuilder().build(),
             AuthUI.IdpConfig.AnonymousBuilder().build()
         )
 
