@@ -5,6 +5,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.saurabhsomani.notesapp.util.formatNoteDate
 import com.saurabhsomani.notesapp.database.entities.Note
+import com.saurabhsomani.notesapp.network.NetworkUseCase
 import com.saurabhsomani.notesapp.usecases.DeleteNoteUseCase
 import com.saurabhsomani.notesapp.usecases.FetchNotesUseCase
 import com.saurabhsomani.notesapp.usecases.InsertNoteUseCase
@@ -19,6 +20,7 @@ class NotesViewModel @Inject constructor(
     private val fetchNotesUseCase: FetchNotesUseCase,
     private val deleteNoteUseCase: DeleteNoteUseCase,
     private val insertNoteUseCase: InsertNoteUseCase,
+    private val networkUseCase: NetworkUseCase,
     getUsernameUseCase: GetUsernameUseCase
 ) : ViewModel() {
 
@@ -31,14 +33,14 @@ class NotesViewModel @Inject constructor(
 
     private fun collectNotesUiItems() {
         viewModelScope.launch {
-            fetchNotesUseCase.getAllNotes()
-                .map { it.getNoteItems() }
-                .collect { noteItems ->
-                    _uiState.update { notesUiState ->
-                        Log.d(TAG, "collectNotesUiItems: ")
-                        notesUiState.copy(notesUiItems = noteItems)
-                    }
+            fetchNotesUseCase.getAllNotes().collect { notes ->
+                networkUseCase.uploadNotes(notes)
+                val noteItems = notes.getNoteItems()
+                _uiState.update { notesUiState ->
+                    Log.d(TAG, "collectNotesUiItems: ")
+                    notesUiState.copy(notesUiItems = noteItems)
                 }
+            }
         }
     }
 

@@ -92,6 +92,7 @@ dependencies {
     implementation 'com.google.firebase:firebase-crashlytics-ktx'
     implementation 'com.google.firebase:firebase-analytics-ktx'
     implementation 'com.google.firebase:firebase-perf-ktx'
+    implementation 'com.google.firebase:firebase-firestore-ktx'
     implementation 'com.firebaseui:firebase-ui-auth:8.0.0'
 
     // Google Play Services

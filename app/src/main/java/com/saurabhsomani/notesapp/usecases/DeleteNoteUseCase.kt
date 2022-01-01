@@ -10,4 +10,8 @@ class DeleteNoteUseCase @Inject constructor(
     suspend operator fun invoke(noteId: Long) {
         notesRepo.deleteNote(noteId)
     }
+
+    suspend fun deleteAllNotes() {
+        notesRepo.deleteAllNotes()
+    }
 }

@@ -28,6 +28,8 @@ class FirebaseSignInActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         binding = DataBindingUtil.setContentView(this, R.layout.activity_firebase_sign_in)
 
+//        AuthUI.getInstance().useEmulator("10.0.2.2", 9099)
+
         if (FirebaseAuth.getInstance().currentUser != null) {
             navigateToMainActivity()
         }

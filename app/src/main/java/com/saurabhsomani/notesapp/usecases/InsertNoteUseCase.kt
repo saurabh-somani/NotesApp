@@ -11,4 +11,8 @@ class InsertNoteUseCase @Inject constructor(
     suspend operator fun invoke(note: Note): Long {
         return notesRepo.insertNote(note)
     }
+
+    suspend operator fun invoke(notes: List<Note>): List<Long> {
+        return notesRepo.insertAllNotes(notes)
+    }
 }

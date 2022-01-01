@@ -2,9 +2,11 @@ package com.saurabhsomani.notesapp.ui
 
 import android.content.Intent
 import android.os.Bundle
+import android.util.Log
 import android.view.Menu
 import android.view.MenuItem
 import androidx.appcompat.app.AppCompatActivity
+import androidx.lifecycle.lifecycleScope
 import androidx.navigation.findNavController
 import androidx.navigation.fragment.NavHostFragment
 import androidx.navigation.ui.AppBarConfiguration
@@ -12,13 +14,18 @@ import androidx.navigation.ui.navigateUp
 import androidx.navigation.ui.setupActionBarWithNavController
 import com.firebase.ui.auth.AuthUI
 import com.saurabhsomani.notesapp.R
+import com.saurabhsomani.notesapp.repository.NotesRepo
+import com.saurabhsomani.notesapp.usecases.DeleteNoteUseCase
 import dagger.hilt.android.AndroidEntryPoint
 import java.lang.RuntimeException
+import javax.inject.Inject
 
 @AndroidEntryPoint
 class MainActivity : AppCompatActivity() {
 
     private lateinit var appBarConfiguration: AppBarConfiguration
+    @Inject
+    lateinit var deleteNoteUseCase: DeleteNoteUseCase
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -53,7 +60,11 @@ class MainActivity : AppCompatActivity() {
                 AuthUI.getInstance()
                     .signOut(this)
                     .addOnCompleteListener {
-                        navigateToFirebaseSignInActivity()
+                        lifecycleScope.launchWhenStarted {
+                            Log.d(TAG, "onOptionsItemSelected: signed out")
+                            deleteNoteUseCase.deleteAllNotes()
+                            navigateToFirebaseSignInActivity()
+                        }
                     }
                 true
             }
@@ -67,5 +78,9 @@ class MainActivity : AppCompatActivity() {
     private fun navigateToFirebaseSignInActivity() {
         val intent = Intent(this, FirebaseSignInActivity::class.java)
         startActivity(intent)
+    }
+
+    companion object {
+        private const val TAG = "MainActivity"
     }
 }

@@ -9,6 +9,8 @@ interface NotesRepo {
 
     suspend fun insertNote(note: Note): Long
 
+    suspend fun insertAllNotes(notes: List<Note>): List<Long>
+
     suspend fun getNoteById(id: Long): Note?
 
     suspend fun updateNoteTitle(noteId: Long, title: String)
@@ -16,4 +18,6 @@ interface NotesRepo {
     suspend fun updateNoteDescription(noteId: Long, description: String)
 
     suspend fun deleteNote(noteId: Long)
+
+    suspend fun deleteAllNotes()
 }

@@ -17,6 +17,14 @@ class NotesRepoImpl @Inject constructor(
         return notesDao.insertNote(note)
     }
 
+    override suspend fun insertAllNotes(notes: List<Note>): List<Long> {
+        return notesDao.insertAllNotes(notes)
+    }
+
+    override suspend fun deleteAllNotes() {
+        notesDao.deleteAllNotes()
+    }
+
     override suspend fun getNoteById(id: Long): Note? {
         return notesDao.getNoteById(id)
     }
