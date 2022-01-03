@@ -13,21 +13,21 @@ class NetworkUseCase @Inject constructor(
 
     suspend fun uploadNotes(notes: List<Note>) {
         val networkNotesList = notes.map { it.toNetworkNote() }
-        val networkNotes = NetworkNotes(networkNotesList)
-        uploadNetworkNotes(networkNotes)
+        uploadNetworkNotes(networkNotesList)
     }
 
-    private suspend fun uploadNetworkNotes(networkNotes: NetworkNotes) =
+    private suspend fun uploadNetworkNotes(networkNotes: List<NetworkNote>) =
         suspendCancellableCoroutine<Unit> { continuation ->
-            firestoreDb.collection("notes").document("notesList")
-                .set(networkNotes)
-                .addOnSuccessListener {
-                    Log.d(TAG, "uploadData: success")
-                    continuation.resume(Unit)
-                }.addOnFailureListener {
-                    Log.e(TAG, "uploadData: failure", it)
-                    continuation.resume(Unit)
-                }
+            val batch = firestoreDb.batch()
+            networkNotes.forEach {
+                val docRef = firestoreDb.collection("notes")
+                    .document(it.id.toString())
+                batch.set(docRef, it)
+            }
+            batch.commit().addOnCompleteListener {
+                Log.d(TAG, "uploadNetworkNotes: ")
+                continuation.resume(Unit)
+            }
         }
 
     suspend fun downloadNotes(): List<Note> {
@@ -36,14 +36,16 @@ class NetworkUseCase @Inject constructor(
 
     private suspend fun downloadNetworkNotes(): List<NetworkNote> =
         suspendCancellableCoroutine { continuation ->
-            firestoreDb.collection("notes").document("notesList")
-                .get()
-                .addOnSuccessListener { document ->
-                    val networkNotes = document?.toObject(NetworkNotes::class.java)
-                    continuation.resume(networkNotes?.networkNotesList ?: emptyList())
-                }.addOnFailureListener {
-                    continuation.resume(emptyList())
+            firestoreDb.collection("notes").get().addOnSuccessListener { result ->
+                val networkNotes = result.documents.mapNotNull { snapshot ->
+                    snapshot.toObject(NetworkNote::class.java).also {
+                        it?.id = snapshot.id.toLongOrNull() ?: 0
+                    }
                 }
+                continuation.resume(networkNotes)
+            }.addOnFailureListener {
+                continuation.resume(emptyList())
+            }
         }
 
     companion object {

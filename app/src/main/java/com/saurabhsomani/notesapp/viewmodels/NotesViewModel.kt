@@ -24,11 +24,27 @@ class NotesViewModel @Inject constructor(
     getUsernameUseCase: GetUsernameUseCase
 ) : ViewModel() {
 
-    private val _uiState = MutableStateFlow(NotesUiState(getUsernameUseCase()))
+    private val _uiState = MutableStateFlow(
+        NotesUiState(
+            username = getUsernameUseCase()
+        )
+    )
     val uiState = _uiState.asStateFlow()
 
     init {
         collectNotesUiItems()
+    }
+
+    fun onNotesRefresh() {
+        viewModelScope.launch {
+            _uiState.update { notesUiState ->
+                notesUiState.copy(notesRefreshing = true)
+            }
+            fetchNotesUseCase.downloadNotesToDb()
+            _uiState.update { notesUiState ->
+                notesUiState.copy(notesRefreshing = false)
+            }
+        }
     }
 
     private fun collectNotesUiItems() {
@@ -130,7 +146,8 @@ class NotesViewModel @Inject constructor(
         val username: String,
         val notesUiItems: List<NoteItemUiState> = emptyList(),
         val navEvents: List<NotesEvent.NavEvent> = emptyList(),
-        val snackBarEvents: List<NotesEvent.SnackBarEvent> = emptyList()
+        val snackBarEvents: List<NotesEvent.SnackBarEvent> = emptyList(),
+        val notesRefreshing: Boolean = false
     )
 
     sealed class NotesEvent {

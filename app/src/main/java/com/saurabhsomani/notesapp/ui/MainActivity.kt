@@ -14,10 +14,8 @@ import androidx.navigation.ui.navigateUp
 import androidx.navigation.ui.setupActionBarWithNavController
 import com.firebase.ui.auth.AuthUI
 import com.saurabhsomani.notesapp.R
-import com.saurabhsomani.notesapp.repository.NotesRepo
 import com.saurabhsomani.notesapp.usecases.DeleteNoteUseCase
 import dagger.hilt.android.AndroidEntryPoint
-import java.lang.RuntimeException
 import javax.inject.Inject
 
 @AndroidEntryPoint

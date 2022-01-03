@@ -64,8 +64,19 @@ class NotesFragment : Fragment() {
                 launch {
                     onSnackBarEventUpdates()
                 }
+                launch {
+                    onNotesRefreshUpdates()
+                }
             }
         }
+    }
+
+    private suspend fun onNotesRefreshUpdates() {
+        viewModel.uiState
+            .map { it.notesRefreshing }
+            .collect { refreshing ->
+                binding.swipeRefreshNotes.isRefreshing = refreshing
+            }
     }
 
     private suspend fun setUsername() {

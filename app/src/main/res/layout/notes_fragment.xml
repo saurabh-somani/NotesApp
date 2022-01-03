@@ -33,21 +33,28 @@
             app:layout_constraintTop_toTopOf="parent"
             tools:text="Hello Saurabh" />
 
-        <androidx.recyclerview.widget.RecyclerView
-            android:id="@+id/notesRecyclerView"
-            onSwiped="@{notesAdapter}"
+        <androidx.swiperefreshlayout.widget.SwipeRefreshLayout
+            android:id="@+id/swipeRefreshNotes"
             android:layout_width="0dp"
             android:layout_height="0dp"
-            android:layout_marginTop="16dp"
-            android:adapter="@{notesAdapter}"
-            android:orientation="vertical"
-            app:layoutManager="androidx.recyclerview.widget.StaggeredGridLayoutManager"
             app:layout_constraintBottom_toBottomOf="parent"
+            app:onRefreshListener="@{() -> viewModel.onNotesRefresh()}"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/notesUsername"
-            app:spanCount="2"
-            tools:listitem="@layout/notes_list_item" />
+            app:layout_constraintTop_toBottomOf="@id/notesUsername">
+
+            <androidx.recyclerview.widget.RecyclerView
+                android:id="@+id/notesRecyclerView"
+                onSwiped="@{notesAdapter}"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:layout_marginTop="16dp"
+                android:adapter="@{notesAdapter}"
+                android:orientation="vertical"
+                app:layoutManager="androidx.recyclerview.widget.StaggeredGridLayoutManager"
+                app:spanCount="2"
+                tools:listitem="@layout/notes_list_item" />
+        </androidx.swiperefreshlayout.widget.SwipeRefreshLayout>
 
         <com.google.android.material.floatingactionbutton.FloatingActionButton
             android:layout_width="wrap_content"

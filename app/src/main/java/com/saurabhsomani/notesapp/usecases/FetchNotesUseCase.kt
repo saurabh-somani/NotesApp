@@ -14,11 +14,15 @@ class FetchNotesUseCase @Inject constructor(
 ) {
 
     fun getAllNotes(): Flow<List<Note>> = flow {
+        downloadNotesToDb()
+        emitAll(notesRepo.getAllNotes())
+    }
+
+    suspend fun downloadNotesToDb() {
         val notes = networkUseCase.downloadNotes()
         if (notes.isNotEmpty()) {
             notesRepo.insertAllNotes(notes)
         }
-        emitAll(notesRepo.getAllNotes())
     }
 
     suspend fun getNoteById(noteId: Long): Note? {
