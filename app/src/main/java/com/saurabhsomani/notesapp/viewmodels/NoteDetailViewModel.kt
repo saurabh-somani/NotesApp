@@ -1,26 +1,27 @@
 package com.saurabhsomani.notesapp.viewmodels
 
+import android.util.Log
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.saurabhsomani.notesapp.database.entities.Note
 import com.saurabhsomani.notesapp.usecases.FetchNotesUseCase
 import com.saurabhsomani.notesapp.usecases.UpdateNoteUseCase
 import com.saurabhsomani.notesapp.util.formatNoteDate
 import dagger.hilt.android.lifecycle.HiltViewModel
-import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.asStateFlow
-import kotlinx.coroutines.flow.update
+import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 @HiltViewModel
 class NoteDetailViewModel @Inject constructor(
-    private val fetchNotesUseCase: FetchNotesUseCase,
+    fetchNotesUseCase: FetchNotesUseCase,
     private val updateNoteUseCase: UpdateNoteUseCase,
     savedStateHandle: SavedStateHandle
 ) : ViewModel() {
 
     private val noteId: Long = savedStateHandle.get("noteId")!!
+    private val noteFlow: Flow<Note> = fetchNotesUseCase.getFlowNoteById(noteId).filterNotNull()
 
     private val _uiState = MutableStateFlow(NoteDetailUiState(isLoading = true))
     val uiState = _uiState.asStateFlow()
@@ -31,36 +32,81 @@ class NoteDetailViewModel @Inject constructor(
 
     private fun loadNote() {
         viewModelScope.launch {
-            val note = fetchNotesUseCase.getNoteById(noteId)
-            note?.let {
+            noteFlow.collect { note ->
+                Log.d(TAG, "loadNote: $note")
                 _uiState.update { noteDetailUiState ->
                     noteDetailUiState.copy(
                         isLoading = false,
-                        title = it.title,
-                        description = it.description,
-                        timestamp = formatNoteDate(it.timestamp)
+                        title = note.title,
+                        description = note.description,
+                        timestamp = formatNoteDate(note.timestamp)
                     )
                 }
             }
         }
     }
 
-    fun saveNoteTitle(text: String) {
+//    private fun loadNote() {
+//        viewModelScope.launch {
+//            val note = fetchNotesUseCase.getNoteById(noteId)
+//            note?.let {
+//                _uiState.update { noteDetailUiState ->
+//                    noteDetailUiState.copy(
+//                        isLoading = false,
+//                        title = it.title,
+//                        description = it.description,
+//                        timestamp = formatNoteDate(it.timestamp)
+//                    )
+//                }
+//            }
+//        }
+//    }
+
+//    fun saveNoteTitle(text: String) {
+//        viewModelScope.launch {
+//            updateNoteUseCase.updateNoteTitle(noteId, text)
+//        }
+//    }
+//
+//    fun saveNoteDescription(text: String) {
+//        viewModelScope.launch {
+//            updateNoteUseCase.updateNoteDescription(noteId, text)
+//        }
+//    }
+
+    fun saveNote() {
         viewModelScope.launch {
-            updateNoteUseCase.updateNoteTitle(noteId, text)
+            _uiState.value.let {
+                Log.d(TAG, "saveNote: $it")
+                updateNoteUseCase.updateNote(noteId, it.title, it.description)
+            }
+            _uiState.update {
+                it.copy(saveBtnVisible = false)
+            }
         }
     }
 
-    fun saveNoteDescription(text: String) {
-        viewModelScope.launch {
-            updateNoteUseCase.updateNoteDescription(noteId, text)
+    fun updateTitle(title: String) {
+        _uiState.update {
+            it.copy(title = title, saveBtnVisible = true)
         }
+    }
+
+    fun updateDescription(description: String) {
+        _uiState.update {
+            it.copy(description = description, saveBtnVisible = true)
+        }
+    }
+
+    companion object {
+        private const val TAG = "NoteDetailViewModel"
     }
 
     data class NoteDetailUiState(
         val isLoading: Boolean = false,
         val title: String = "",
         val description: String = "",
-        val timestamp: String = ""
+        val timestamp: String = "",
+        val saveBtnVisible: Boolean = false
     )
 }

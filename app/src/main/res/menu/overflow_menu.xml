@@ -12,4 +12,9 @@
         android:id="@+id/action_test_crash"
         android:title="@string/overflow_menu_test_crash"
         app:showAsAction="never" />
+    <item
+        android:id="@+id/action_save_note"
+        android:title="@string/action_save_note"
+        android:visible="false"
+        app:showAsAction="ifRoom" />
 </menu>

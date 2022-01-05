@@ -4,16 +4,20 @@ import android.util.Log
 import com.google.firebase.auth.FirebaseUser
 import com.google.firebase.firestore.FirebaseFirestore
 import com.saurabhsomani.notesapp.database.entities.Note
+import com.saurabhsomani.notesapp.di.IoDispatcher
+import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.suspendCancellableCoroutine
+import kotlinx.coroutines.withContext
 import javax.inject.Inject
 import kotlin.coroutines.resume
 
 class NetworkUseCase @Inject constructor(
     private val firestoreDb: FirebaseFirestore,
-    private val firebaseUser: FirebaseUser?
+    private val firebaseUser: FirebaseUser?,
+    @IoDispatcher private val ioDispatcher: CoroutineDispatcher
 ) {
 
-    suspend fun uploadNotes(notes: List<Note>) {
+    suspend fun uploadNotes(notes: List<Note>) = withContext(ioDispatcher) {
         val networkNotesList = notes.map { it.toNetworkNote() }
         uploadNetworkNotes(networkNotesList)
     }

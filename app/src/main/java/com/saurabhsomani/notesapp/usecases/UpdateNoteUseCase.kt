@@ -14,4 +14,8 @@ class UpdateNoteUseCase @Inject constructor(
     suspend fun updateNoteDescription(noteId: Long, description: String) {
         notesRepo.updateNoteDescription(noteId, description)
     }
+
+    suspend fun updateNote(noteId: Long, title: String, description: String) {
+        notesRepo.updateNote(noteId, title, description)
+    }
 }

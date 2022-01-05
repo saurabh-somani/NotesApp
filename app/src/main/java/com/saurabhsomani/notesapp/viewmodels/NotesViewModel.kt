@@ -3,14 +3,16 @@ package com.saurabhsomani.notesapp.viewmodels
 import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.saurabhsomani.notesapp.util.formatNoteDate
 import com.saurabhsomani.notesapp.database.entities.Note
+import com.saurabhsomani.notesapp.di.IoDispatcher
 import com.saurabhsomani.notesapp.network.NetworkUseCase
 import com.saurabhsomani.notesapp.usecases.DeleteNoteUseCase
 import com.saurabhsomani.notesapp.usecases.FetchNotesUseCase
-import com.saurabhsomani.notesapp.usecases.InsertNoteUseCase
 import com.saurabhsomani.notesapp.usecases.GetUsernameUseCase
+import com.saurabhsomani.notesapp.usecases.InsertNoteUseCase
+import com.saurabhsomani.notesapp.util.formatNoteDate
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
 import javax.inject.Inject
@@ -21,7 +23,8 @@ class NotesViewModel @Inject constructor(
     private val deleteNoteUseCase: DeleteNoteUseCase,
     private val insertNoteUseCase: InsertNoteUseCase,
     private val networkUseCase: NetworkUseCase,
-    getUsernameUseCase: GetUsernameUseCase
+    getUsernameUseCase: GetUsernameUseCase,
+    @IoDispatcher private val ioDispatcher: CoroutineDispatcher
 ) : ViewModel() {
 
     private val _uiState = MutableStateFlow(
@@ -49,14 +52,15 @@ class NotesViewModel @Inject constructor(
 
     private fun collectNotesUiItems() {
         viewModelScope.launch {
-            fetchNotesUseCase.getAllNotes().collect { notes ->
-                networkUseCase.uploadNotes(notes)
-                val noteItems = notes.getNoteItems()
-                _uiState.update { notesUiState ->
-                    Log.d(TAG, "collectNotesUiItems: ")
-                    notesUiState.copy(notesUiItems = noteItems)
+            fetchNotesUseCase.getAllNotes()
+                .onEach { networkUseCase.uploadNotes(it) }
+                .map { it.getNoteItems() }
+                .collect { notesUiItems ->
+                    _uiState.update { notesUiState ->
+                        Log.d(TAG, "collectNotesUiItems: ")
+                        notesUiState.copy(notesUiItems = notesUiItems)
+                    }
                 }
-            }
         }
     }
 

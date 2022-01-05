@@ -25,6 +25,14 @@ class NotesRepoImpl @Inject constructor(
         notesDao.deleteAllNotes()
     }
 
+    override suspend fun updateNote(noteId: Long, title: String, description: String) {
+        notesDao.updateNote(noteId, title, description)
+    }
+
+    override fun getFlowNoteById(noteId: Long): Flow<Note?> {
+        return notesDao.getFlowNoteById(noteId)
+    }
+
     override suspend fun getNoteById(id: Long): Note? {
         return notesDao.getNoteById(id)
     }

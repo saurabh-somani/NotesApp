@@ -15,4 +15,5 @@
     <string name="notes_screen_username_text">Hello %1$s</string>
     <string name="username_guest">guest user</string>
     <string name="notes_screen_title">Notes</string>
+    <string name="action_save_note">Save</string>
 </resources>

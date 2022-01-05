@@ -30,4 +30,10 @@ interface NotesDao {
 
     @Query("DELETE FROM Note")
     suspend fun deleteAllNotes()
+
+    @Query("UPDATE Note SET title = :title, description = :description WHERE id = :noteId")
+    suspend fun updateNote(noteId: Long, title: String, description: String)
+
+    @Query("SELECT * FROM Note WHERE id = :noteId")
+    fun getFlowNoteById(noteId: Long): Flow<Note?>
 }
