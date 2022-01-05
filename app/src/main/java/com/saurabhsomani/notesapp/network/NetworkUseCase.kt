@@ -1,6 +1,7 @@
 package com.saurabhsomani.notesapp.network
 
 import android.util.Log
+import com.google.firebase.auth.FirebaseUser
 import com.google.firebase.firestore.FirebaseFirestore
 import com.saurabhsomani.notesapp.database.entities.Note
 import kotlinx.coroutines.suspendCancellableCoroutine
@@ -8,7 +9,8 @@ import javax.inject.Inject
 import kotlin.coroutines.resume
 
 class NetworkUseCase @Inject constructor(
-    private val firestoreDb: FirebaseFirestore
+    private val firestoreDb: FirebaseFirestore,
+    private val firebaseUser: FirebaseUser?
 ) {
 
     suspend fun uploadNotes(notes: List<Note>) {
@@ -18,15 +20,17 @@ class NetworkUseCase @Inject constructor(
 
     private suspend fun uploadNetworkNotes(networkNotes: List<NetworkNote>) =
         suspendCancellableCoroutine<Unit> { continuation ->
-            val batch = firestoreDb.batch()
-            networkNotes.forEach {
-                val docRef = firestoreDb.collection("notes")
-                    .document(it.id.toString())
-                batch.set(docRef, it)
-            }
-            batch.commit().addOnCompleteListener {
-                Log.d(TAG, "uploadNetworkNotes: ")
-                continuation.resume(Unit)
+            firebaseUser?.let { user ->
+                val batch = firestoreDb.batch()
+                networkNotes.forEach {
+                    val docRef = firestoreDb.collection("users/${user.uid}/notes")
+                        .document(it.id.toString())
+                    batch.set(docRef, it)
+                }
+                batch.commit().addOnCompleteListener {
+                    Log.d(TAG, "uploadNetworkNotes: ")
+                    continuation.resume(Unit)
+                }
             }
         }
 
@@ -36,15 +40,18 @@ class NetworkUseCase @Inject constructor(
 
     private suspend fun downloadNetworkNotes(): List<NetworkNote> =
         suspendCancellableCoroutine { continuation ->
-            firestoreDb.collection("notes").get().addOnSuccessListener { result ->
-                val networkNotes = result.documents.mapNotNull { snapshot ->
-                    snapshot.toObject(NetworkNote::class.java).also {
-                        it?.id = snapshot.id.toLongOrNull() ?: 0
+            firebaseUser?.let { user ->
+                firestoreDb.collection("users/${user.uid}/notes")
+                    .get().addOnSuccessListener { result ->
+                        val networkNotes = result.documents.mapNotNull { snapshot ->
+                            snapshot.toObject(NetworkNote::class.java).also {
+                                it?.id = snapshot.id.toLongOrNull() ?: 0
+                            }
+                        }
+                        continuation.resume(networkNotes)
+                    }.addOnFailureListener {
+                        continuation.resume(emptyList())
                     }
-                }
-                continuation.resume(networkNotes)
-            }.addOnFailureListener {
-                continuation.resume(emptyList())
             }
         }
 
