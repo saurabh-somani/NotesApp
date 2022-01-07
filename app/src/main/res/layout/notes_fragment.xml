@@ -5,6 +5,9 @@
 
     <data>
 
+        <import type="com.saurabhsomani.notesapp.viewmodels.NotesViewModel.NotesEvent.OnFabClicked" />
+        <import type="com.saurabhsomani.notesapp.viewmodels.NotesViewModel.NotesEvent.OnNotesRefresh" />
+
         <variable
             name="viewModel"
             type="com.saurabhsomani.notesapp.viewmodels.NotesViewModel" />
@@ -38,7 +41,7 @@
             android:layout_width="0dp"
             android:layout_height="0dp"
             app:layout_constraintBottom_toBottomOf="parent"
-            app:onRefreshListener="@{() -> viewModel.onNotesRefresh()}"
+            app:onRefreshListener="@{() -> viewModel.onEvent(OnNotesRefresh.INSTANCE)}"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@id/notesUsername">
@@ -62,7 +65,7 @@
             android:layout_margin="16dp"
             android:backgroundTint="@color/blue_secondary"
             android:contentDescription="@null"
-            android:onClick="@{() -> viewModel.onFabClicked()}"
+            android:onClick="@{() -> viewModel.onEvent(OnFabClicked.INSTANCE)}"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             app:srcCompat="@android:drawable/ic_input_add"

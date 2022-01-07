@@ -89,18 +89,18 @@ class NotesFragment : Fragment() {
 
     private suspend fun onSnackBarEventUpdates() {
         viewModel.uiState
-            .map { it.snackBarEvents }
+            .map { it.snackbarEvents }
             .distinctUntilChanged()
             .collect { snackbarEvents ->
                 Log.d(TAG, "onSnackBarEventUpdates: $snackbarEvents")
                 snackbarEvents.firstOrNull()?.let {
                     showSnackBar(it)
-                    viewModel.onSnackBarShown(it.id)
+                    viewModel.onEvent(NotesEvent.OnSnackbarShown(it.id))
                 }
             }
     }
 
-    private fun showSnackBar(snackBarEvent: NotesEvent.SnackBarEvent) {
+    private fun showSnackBar(snackBarEvent: NotesViewModel.NotesUiEvent.SnackbarEvent) {
         Log.d(TAG, "showSnackBar: $snackBarEvent")
         Snackbar.make(
             binding.root,
@@ -129,7 +129,7 @@ class NotesFragment : Fragment() {
                 Log.d(TAG, "onNavEventUpdates: $navEvents")
                 navEvents.firstOrNull()?.let {
                     navigateToDetailFragment(it.noteId)
-                    viewModel.onNavComplete()
+                    viewModel.onEvent(NotesEvent.OnNavComplete)
                 }
             }
     }

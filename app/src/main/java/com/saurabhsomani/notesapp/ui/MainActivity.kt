@@ -14,7 +14,7 @@ import androidx.navigation.ui.navigateUp
 import androidx.navigation.ui.setupActionBarWithNavController
 import com.firebase.ui.auth.AuthUI
 import com.saurabhsomani.notesapp.R
-import com.saurabhsomani.notesapp.usecases.DeleteNoteUseCase
+import com.saurabhsomani.notesapp.repository.NotesRepo
 import dagger.hilt.android.AndroidEntryPoint
 import javax.inject.Inject
 
@@ -23,7 +23,7 @@ class MainActivity : AppCompatActivity() {
 
     private lateinit var appBarConfiguration: AppBarConfiguration
     @Inject
-    lateinit var deleteNoteUseCase: DeleteNoteUseCase
+    lateinit var notesRepo: NotesRepo
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -60,7 +60,7 @@ class MainActivity : AppCompatActivity() {
                     .addOnCompleteListener {
                         lifecycleScope.launchWhenStarted {
                             Log.d(TAG, "onOptionsItemSelected: signed out")
-                            deleteNoteUseCase.deleteAllNotes()
+                            notesRepo.deleteAllNotes()
                             navigateToFirebaseSignInActivity()
                         }
                     }

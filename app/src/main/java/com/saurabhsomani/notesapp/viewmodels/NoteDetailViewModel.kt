@@ -5,8 +5,7 @@ import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.saurabhsomani.notesapp.database.entities.Note
-import com.saurabhsomani.notesapp.usecases.FetchNotesUseCase
-import com.saurabhsomani.notesapp.usecases.UpdateNoteUseCase
+import com.saurabhsomani.notesapp.repository.NotesRepo
 import com.saurabhsomani.notesapp.util.formatNoteDate
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.*
@@ -15,13 +14,12 @@ import javax.inject.Inject
 
 @HiltViewModel
 class NoteDetailViewModel @Inject constructor(
-    fetchNotesUseCase: FetchNotesUseCase,
-    private val updateNoteUseCase: UpdateNoteUseCase,
+    private val notesRepo: NotesRepo,
     savedStateHandle: SavedStateHandle
 ) : ViewModel() {
 
     private val noteId: Long = savedStateHandle.get("noteId")!!
-    private val noteFlow: Flow<Note> = fetchNotesUseCase.getFlowNoteById(noteId).filterNotNull()
+    private val noteFlow: Flow<Note> = notesRepo.getFlowNoteById(noteId).filterNotNull()
 
     private val _uiState = MutableStateFlow(NoteDetailUiState(isLoading = true))
     val uiState = _uiState.asStateFlow()
@@ -78,7 +76,7 @@ class NoteDetailViewModel @Inject constructor(
         viewModelScope.launch {
             _uiState.value.let {
                 Log.d(TAG, "saveNote: $it")
-                updateNoteUseCase.updateNote(noteId, it.title, it.description)
+                notesRepo.updateNote(noteId, it.title, it.description)
             }
             _uiState.update {
                 it.copy(saveBtnVisible = false)

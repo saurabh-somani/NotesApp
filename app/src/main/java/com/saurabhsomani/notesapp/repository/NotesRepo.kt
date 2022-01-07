@@ -24,4 +24,6 @@ interface NotesRepo {
     suspend fun updateNote(noteId: Long, title: String, description: String)
 
     fun getFlowNoteById(noteId: Long): Flow<Note?>
+
+    suspend fun downloadNotesToDb()
 }
