@@ -51,7 +51,7 @@ class NotesFragment : Fragment() {
 
     private fun receiveUiStateUpdates() {
         viewLifecycleOwner.lifecycleScope.launch {
-            repeatOnLifecycle(Lifecycle.State.STARTED) {
+            viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.STARTED) {
                 launch {
                     setUsername()
                 }
@@ -95,7 +95,6 @@ class NotesFragment : Fragment() {
                 Log.d(TAG, "onSnackBarEventUpdates: $snackbarEvents")
                 snackbarEvents.firstOrNull()?.let {
                     showSnackBar(it)
-                    viewModel.onEvent(NotesEvent.OnSnackbarShown(it.id))
                 }
             }
     }
@@ -108,7 +107,14 @@ class NotesFragment : Fragment() {
             Snackbar.LENGTH_LONG
         ).setAction(context.getResStrByName(snackBarEvent.actionTextResStr)) {
             snackBarEvent.onActionClick.invoke()
-        }.show()
+        }.addCallback(object: Snackbar.Callback() {
+            override fun onDismissed(transientBottomBar: Snackbar?, event: Int) {
+                super.onDismissed(transientBottomBar, event)
+                if (event == DISMISS_EVENT_TIMEOUT) {
+                    viewModel.onEvent(NotesEvent.OnSnackbarShown(snackBarEvent.id))
+                }
+            }
+        }).show()
     }
 
     private suspend fun onNotesAdapterUpdates() {
@@ -116,6 +122,7 @@ class NotesFragment : Fragment() {
             .map { it.notesUiItems }
             .distinctUntilChanged()
             .collect { noteItemUiStateList ->
+                Int.MIN_VALUE.plus(1)
                 Log.d(TAG, "onNotesAdapterUpdates: $noteItemUiStateList")
                 binding.notesAdapter?.submitList(noteItemUiStateList)
             }
